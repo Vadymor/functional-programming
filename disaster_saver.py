@@ -37,10 +37,11 @@ def store_disaster_event(c: Connection, event, event_type):
         title = event[1]
         longitude = event[2]
         latitude = event[3]
+        event_datetime = event[4]
 
         c.execute(f"""
-            INSERT INTO disaster_event (id, title, longitude, latitude) VALUES
-                ('{event_id}', '{title}', {longitude}, {latitude})""")
+            INSERT INTO disaster_event (id, title, longitude, latitude, event_datetime) VALUES
+                ('{event_id}', '{title}', {longitude}, {latitude}, '{event_datetime}')""")
         c.commit()
     if event_type == 'calendar':
         pass
@@ -53,7 +54,8 @@ def save(source, event_type) -> Observable[None]:
                 id text, 
                 title text, 
                 longitude integer, 
-                latitude integer);"""
+                latitude integer,
+                event_datetime text);"""
     if event_type == 'calendar':
         pass
 
