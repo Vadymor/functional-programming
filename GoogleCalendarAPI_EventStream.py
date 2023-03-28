@@ -7,6 +7,7 @@ import datetime
 import asyncio
 import nest_asyncio
 import reactivex
+import disaster_saver
 
 from reactivex import operators as ops, Observable
 from functools import wraps, partial
@@ -94,7 +95,8 @@ def main(current_loop):
         ops.flat_map(flatten), # do async API request
         ops.map(lambda x: x['items']),  # from API response get list with events  # do async API request
         ops.flat_map(lambda x: x),  # flatten events list
-        ops.map(lambda i: (i['id'], i['summary'], i['location'], i["start"]["dateTime"]))  # get only needful attributes from event
+        ops.map(lambda i: (i['id'], i['summary'], i['location'], i["start"]["dateTime"])),  # get only needful attributes from event
+        lambda x: disaster_saver.save(x, 'calendar')
     ).subscribe(on_next=print)
 
 

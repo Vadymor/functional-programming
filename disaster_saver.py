@@ -43,7 +43,18 @@ def store_disaster_event(c: Connection, event, event_type):
                 ('{event_id}', '{title}', {longitude}, {latitude})""")
         c.commit()
     if event_type == 'calendar':
-        pass
+        event_id = event[0]
+        title = event[1]
+        location = event[2][1:-1].split(', ')
+        longitude = int(location[0])
+        latitude = int(location[1])
+        event_datetime = event[3]
+
+
+        c.execute(f"""
+            INSERT INTO calendar_event (id, title, longitude, latitude, event_datetime) VALUES
+                ('{event_id}', '{title}', {longitude}, {latitude}, '{event_datetime}')""")
+        c.commit()
 
 
 def save(source, event_type) -> Observable[None]:
@@ -55,7 +66,13 @@ def save(source, event_type) -> Observable[None]:
                 longitude integer, 
                 latitude integer);"""
     if event_type == 'calendar':
-        pass
+        create_table = """
+            CREATE TABLE IF NOT EXISTS calendar_event(
+                id text, 
+                title text, 
+                longitude integer, 
+                latitude integer,
+                event_datetime text);"""
 
     return (connection_observable.pipe(
         execute(create_table),
