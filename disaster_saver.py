@@ -31,28 +31,36 @@ def _ex(query_string: str, cn: Connection) -> Observable[Cursor]:
     return reactivex.defer(lambda s: reactivex.start(lambda: cn.execute(query_string), s))
 
 
-def store_trade(c: Connection, event):
-    event_id = event[0]
-    title = event[1]
-    longitude = event[2]
-    latitude = event[3]
+def store_disaster_event(c: Connection, event, event_type):
+    if event_type == 'disaster':
+        event_id = event[0]
+        title = event[1]
+        longitude = event[2]
+        latitude = event[3]
 
-    c.execute(f"""
-        INSERT INTO disaster_event (id, title, longitude, latitude) VALUES
-            ('{event_id}', '{title}', {longitude}, {latitude})""")
-    c.commit()
+        c.execute(f"""
+            INSERT INTO disaster_event (id, title, longitude, latitude) VALUES
+                ('{event_id}', '{title}', {longitude}, {latitude})""")
+        c.commit()
+    if event_type == 'calendar':
+        pass
 
 
-def save(source) -> Observable[None]:
-    return (connection_observable.pipe(
-        execute(
-            '''
+def save(source, event_type) -> Observable[None]:
+    if event_type == 'disaster':
+        create_table = """
             CREATE TABLE IF NOT EXISTS disaster_event(
                 id text, 
                 title text, 
                 longitude integer, 
-                latitude integer);'''),
+                latitude integer);"""
+    if event_type == 'calendar':
+        pass
+
+    return (connection_observable.pipe(
+        execute(create_table),
         ops.flat_map(
-            lambda connect: source.pipe(ops.observe_on(scheduler), ops.map(lambda trade: store_trade(connect, trade)))),
+            lambda connect: source.pipe(ops.observe_on(scheduler),
+                                        ops.map(lambda event: store_disaster_event(connect, event, event_type)))),
         ops.ignore_elements()
     ))

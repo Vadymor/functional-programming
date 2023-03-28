@@ -30,6 +30,7 @@ creds = None
 # time.
 
 def create_creds():
+    global creds
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
         return creds
