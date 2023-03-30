@@ -37,5 +37,4 @@ Only eligible events are sent to Telegram chat to notify you, that your calendar
 
 Here is a notification example:
 
-- text in red
 <span style="color:red;font-weight:bold;">Your planned event Bus at 2021-06-14T15:20:19 02:00 is threatened by Wildfire MB-NO102, Manitoba, Canada.</span>
